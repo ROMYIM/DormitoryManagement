@@ -7,6 +7,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.dormitory.constant.Authentication;
 import com.dormitory.constant.Gender;
@@ -19,10 +23,22 @@ public class User implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@NotEmpty(message = "{id.not.empty}")
+	@Length(min = 5, max = 15, message = "id.length.error")
 	private String id;
+	
+	@NotEmpty(message = "{name.not.empty}")
+	@Length(min = 2, max = 4, message = "{name.length.error")
 	private String name;
+	
+	@NotEmpty(message = "{password.not.empty}")
+	@Length(min = 6, message = "{password.length.error}")
 	private String password;
+	
+	@NotNull(message = "{gender.not.empty}")
 	private Gender gender;
+	
+	@NotNull(message = "{auth.not.empty}")
 	private Authentication authentication;
 	
 	@Id

@@ -32,13 +32,17 @@
     </bean> -->
 	
 	<!-- 或者使用以下配置，自动注入映射器和适配器的bean -->
-	<mvc:annotation-driven conversion-service="conversionService">
+	<mvc:annotation-driven conversion-service="conversionService" validator="validator">
         <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
               <constructor-arg value="UTF-8" />
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+    
+    <mvc:interceptors>
+    	<bean class="com.dormitory.interceptor.LoginInterceptor"/>
+    </mvc:interceptors>
 	
 	<!-- 数据类型转换配置 -->
 	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
@@ -47,6 +51,19 @@
 				<bean class="com.dormitory.util.converter.DateConverter" />
 			</list>
 		</property>
+	</bean>
+	
+	<!-- 配置验证器 -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+		<property name="validationMessageSource" ref="messageSource"/>
+	</bean>
+	
+	<!-- 注册信息文件 -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages"/>
+		<property name="fileEncodings" value="utf-8"/>
+		<property name="cacheSeconds" value="120"/>
 	</bean>
 	
 	<!-- 开启controller注解支持 -->

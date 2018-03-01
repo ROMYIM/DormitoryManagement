@@ -8,9 +8,11 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +43,7 @@ import com.google.gson.GsonBuilder;
 
 @Controller
 @RequestMapping("/app/student")
-@SessionAttributes(value = {"student"}, types = {Student.class})
+@SessionAttributes(value = {"user"}, types = {Student.class})
 public class AppStudentController {
 
 	@Resource(name = "studentService")
@@ -51,7 +53,7 @@ public class AppStudentController {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@ModelAttribute("student")
+	@ModelAttribute("user")
 	public Student initStudent(@CookieValue(value = "id", required = false) String id, @RequestParam(value = "id", required = false) String studentId) {
 		if (id != null && id.length() > 0) {
 			return studentService.findStudentById(id);
@@ -64,7 +66,10 @@ public class AppStudentController {
 	@RequestMapping(value = "/login", headers = "isFirst", method = RequestMethod.POST)
 	@ResponseBody
 	public String login(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, @ModelAttribute Student student,
-			@RequestHeader("isFirst") Boolean isFirst, HttpServletResponse response, User user, HttpSession session) {
+			@RequestHeader("isFirst") Boolean isFirst, @Valid User user, Errors errors, HttpSession session, HttpServletResponse response) {
+		if (errors.hasErrors()) {
+			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
+		}
 		if (student != null) {
 			if (student.getPassword().equals(user.getPassword())) {
 				if (isFirst) {
@@ -75,7 +80,7 @@ public class AppStudentController {
 					response.addCookie(passwordCookie);
 					response.addCookie(authCookie);
 				}
-				session.setAttribute("student", student);
+				session.setAttribute("user", student);
 				session.setMaxInactiveInterval(30 * 60);
 				return gson.toJson(result.setResult(ResultType.SUCCESS));
 			}

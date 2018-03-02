@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import com.dormitory.constant.RepairStatus;
 import com.dormitory.constant.RepairType;
@@ -24,8 +26,14 @@ public class RepairInformation extends Information {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
+	@Valid
 	private Dormitory dormitory;
+	
+	@NotNull
 	private RepairType type;
+	
+	@NotNull
 	private RepairStatus status;
 	private MaintenanceWorker worker;
 

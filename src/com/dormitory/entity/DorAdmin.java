@@ -20,7 +20,6 @@ public class DorAdmin extends User {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
 	private Building manageBuilding;
 	private Date manageDate;
 

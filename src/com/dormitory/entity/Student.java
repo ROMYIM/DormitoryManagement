@@ -13,6 +13,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "student")
@@ -23,10 +28,19 @@ public class Student extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull(message = "{major.not.empty}")
 	private String major;
+	
+	@Range(min = 1, max = 4)
 	private Integer classNum;
+	
+	@Min(value = 2014)
 	private Integer grade;
+	
+	@DateTimeFormat(style = "yyyy-MM-dd")
 	private Date checkInDate;
+	
+	@DateTimeFormat(style = "yyyy-MM-dd")
 	private Date moveDate;
 	private Dormitory dormitory;
 	private List<ViolationRecord> violationRecords;

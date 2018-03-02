@@ -5,7 +5,7 @@ public enum ResultType {
 	AL_REGISTER(103, "failed", "已经注册"),ERR_LOGIN(104, "failed", "登录错误"), ERR_QUERY(200, "failed", "查询失败"), 
 	ERR_DORMITORY(201, "failed", "查询宿舍失败"), ERR_STUDENT(202, "failed", "查询学生失败"),ERR_VIOLATION(203, "failed", "查询违规记录失败"), 
 	ERR_REPAIR(204, "failed", "查询维修记录失败"), ERR_DORADMIN(205, "failed", "查询宿舍管理员失败"),ERR_NOTICE(206, "failed", "查询公告失败"),
-	ERR_UNKONOWN(500, "failed", "未知错误");
+	ERR_UNKONOWN(500, "failed", "未知错误"), ERR_AUTH(105, "failed", "身份不匹配");
 	
 	private final int code;
 	private final String result;

@@ -37,11 +37,13 @@
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
               <constructor-arg value="UTF-8" />
             </bean>
+            <bean class="org.springframework.http.converter.json.GsonHttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
     
     <mvc:interceptors>
     	<bean class="com.dormitory.interceptor.LoginInterceptor"/>
+    	<bean class="com.dormitory.interceptor.AuthInterceptor"/>
     </mvc:interceptors>
 	
 	<!-- 数据类型转换配置 -->

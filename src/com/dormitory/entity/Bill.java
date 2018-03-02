@@ -17,6 +17,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.Valid;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.format.annotation.NumberFormat.Style;
 
 import com.dormitory.constant.BillType;
 
@@ -28,10 +36,25 @@ public class Bill implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	@NotNull 
 	private Integer id;
+	
+	@NotNull
+	@DateTimeFormat(style = "yyyy-mm-dd hh:MM:ss")
 	private Date payDate;
+	
+	@NotNull
+	@Valid
 	private Dormitory dormitory;
+	
+	@NotNull
 	private BillType type;
+	
+	@NotNull
+	@Digits(fraction = 2, integer = 3)
+	@Min(value = 0)
+	@NumberFormat(style = Style.CURRENCY)
 	private Float payMoney;
 
 	public Bill() {

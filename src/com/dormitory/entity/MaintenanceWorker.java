@@ -9,6 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.dormitory.constant.RepairType;
 
@@ -21,6 +22,7 @@ public class MaintenanceWorker extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 	private List<RepairInformation> repairInformations;
+	@NotNull
 	private RepairType workerType;
 
 	public MaintenanceWorker() {

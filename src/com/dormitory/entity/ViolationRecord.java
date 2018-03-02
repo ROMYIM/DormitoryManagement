@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import com.dormitory.constant.ViolationType;
 
@@ -22,7 +24,12 @@ public class ViolationRecord extends Information {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	@NotNull
 	private ViolationType type;
+	
+	@NotNull
+	@Valid
 	private Student student;
 	private DorAdmin dorAdmin;
 

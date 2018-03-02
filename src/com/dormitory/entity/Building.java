@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Range;
 
 @Entity
 @Table(name = "building")
@@ -19,7 +22,8 @@ public class Building implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+	@NotNull
+	@Range(min = 1, max = 99)
 	private Integer buildingNum;
 	private List<Notice> notices;
 	private List<DorAdmin> dorAdmins;

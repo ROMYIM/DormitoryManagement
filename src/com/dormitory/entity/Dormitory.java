@@ -14,6 +14,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.format.annotation.NumberFormat.Style;
 
 @Entity
 @Table(name = "dormitory")
@@ -23,13 +31,30 @@ public class Dormitory implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+	@NotNull
+	@Length(min = 5, max = 5)
 	private String dormitoryId;
+	
+	@NotNull
+	@Range(min = 0, max = 99)
 	private Integer id;
+	
+	@NotNull
+	@Range(min = 1, max = 99)
 	private Integer floor;
+	
+	@NotNull
+	@Valid
 	private Building building;
+	
+	@Digits(integer = 3, fraction = 2)
+	@NumberFormat(style = Style.CURRENCY)
 	private Float ebills;
+	
+	@Digits(integer = 3, fraction = 2)
+	@NumberFormat(style = Style.CURRENCY)
 	private Float wbills;
+	
 	private List<Student> students = new ArrayList<>();
 	private List<RepairInformation> repairInformations = new ArrayList<>();
 	private List<Bill> bills = new ArrayList<>();

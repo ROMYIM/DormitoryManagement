@@ -11,6 +11,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @MappedSuperclass
 public class Information implements Serializable {
 
@@ -21,7 +23,9 @@ public class Information implements Serializable {
 	
 	private Integer id;
 	private String content;
+	@DateTimeFormat(style = "yyyy-MM-dd")
 	private Date sendDate;
+	@DateTimeFormat(style = "yyyy-mm-dd")
 	private Date deadline;
 
 	public Information() {

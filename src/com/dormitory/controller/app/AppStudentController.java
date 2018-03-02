@@ -38,12 +38,11 @@ import com.dormitory.entity.User;
 import com.dormitory.entity.ViolationRecord;
 import com.dormitory.service.IStudentService;
 import com.dormitory.util.CookieUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @Controller
 @RequestMapping("/app/student")
 @SessionAttributes(value = {"user"}, types = {Student.class})
+@ResponseBody
 public class AppStudentController {
 
 	@Resource(name = "studentService")
@@ -54,7 +53,8 @@ public class AppStudentController {
 	}
 	
 	@ModelAttribute("user")
-	public Student initStudent(@CookieValue(value = "id", required = false) String id, @RequestParam(value = "id", required = false) String studentId) {
+	public Student initStudent(@CookieValue(value = "id", required = false) String id, 
+			@RequestParam(value = "id", required = false) String studentId) {
 		if (id != null && id.length() > 0) {
 			return studentService.findStudentById(id);
 		} else if (studentId != null && studentId.length() > 0) {
@@ -64,11 +64,11 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/login", headers = "isFirst", method = RequestMethod.POST)
-	@ResponseBody
-	public String login(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, @ModelAttribute Student student,
-			@RequestHeader("isFirst") Boolean isFirst, @Valid User user, Errors errors, HttpSession session, HttpServletResponse response) {
+	public ResponseResult login(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student,
+			@RequestHeader("isFirst") Boolean isFirst, @Valid User user, Errors errors, 
+			HttpSession session, HttpServletResponse response) {
 		if (errors.hasErrors()) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
+			return result.setResult(ResultType.ERR_LOGIN);
 		}
 		if (student != null) {
 			if (student.getPassword().equals(user.getPassword())) {
@@ -82,141 +82,110 @@ public class AppStudentController {
 				}
 				session.setAttribute("user", student);
 				session.setMaxInactiveInterval(30 * 60);
-				return gson.toJson(result.setResult(ResultType.SUCCESS));
+				return result.setResult(ResultType.SUCCESS);
 			}
-			return gson.toJson(result.setResult(ResultType.ERR_PASSWORD));
+			return result.setResult(ResultType.ERR_PASSWORD);
 		}
-		return gson.toJson(result.setResult(ResultType.NO_USER));
+		return result.setResult(ResultType.NO_USER);
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	@ResponseBody
-	public String register(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, Student student) {
+	public ResponseResult register(@ModelAttribute ResponseResult result, Student student) {
 		if (studentService.findStudentById(student.getId()) != null) {
-			return gson.toJson(result.setResult(ResultType.AL_REGISTER));
+			return result.setResult(ResultType.AL_REGISTER);
 		}
 		studentService.registerStudent(student);
-		return gson.toJson(result.setResult(ResultType.SUCCESS));
+		return result.setResult(ResultType.SUCCESS);
 	}
 	
 	@RequestMapping(value = "/payBills/{billType}", params = "bills", method = RequestMethod.POST)
-	@ResponseBody
-	public String payBills(@ModelAttribute Gson gson, @PathVariable BillType billType, @ModelAttribute Student student,
+	public ResponseResult payBills(@PathVariable BillType billType, @ModelAttribute("user") Student student,
 			@ModelAttribute ResponseResult result, @RequestParam(defaultValue = "0") Float bills) {
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
 		Dormitory dormitory = student.getDormitory();
 		if (dormitory == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_DORMITORY));
+			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		studentService.payBill(dormitory.getDormitoryId(), bills, billType);
-		return gson.toJson(result.setResult(ResultType.SUCCESS));
+		return result.setResult(ResultType.SUCCESS);
 	}
 	
 	@RequestMapping(value = "/lookBill", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookBill(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, @ModelAttribute Student student, 
+	public ResponseResult lookBill(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
 			Model model) {
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
 		if (student.getDormitory() == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_DORMITORY));
+			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
 		Map<String, String> billMap = studentService.lookBalance(dormitoryId);
 		model.addAttribute("Àﬁ…·∫≈", dormitoryId);
 		model.addAllAttributes(billMap);
-		return gson.toJson(billMap);
+		result.setResult(billMap);
+		return result;
 	}
 	
 	@RequestMapping(value = "/lookBills", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookBills(@ModelAttribute ResponseResult result, @ModelAttribute Student student, 
+	public ResponseResult lookBills(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
 			BillType type, Date from, Date to) {
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd hh:mm:ss").setPrettyPrinting().create();
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
 		if (student.getDormitory() == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_DORMITORY));
+			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
 		List<Bill> bills = studentService.lookBills(dormitoryId, type, from, to);
 		result.setResult(ResultType.SUCCESS).setResult(bills);
-		return gson.toJson(result);
+		return result;
 	}
 	
 	@RequestMapping(value = "/lookViolations", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookViolation(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, 
-			@ModelAttribute Student student, Date from, Date to) {
-		if (student != null) {
-			List<ViolationRecord> violationRecords = studentService.lookViolationes(student.getId(), from, to);
-			if (violationRecords != null) {
-				result.setResult(ResultType.SUCCESS).setResult(violationRecords);
-				return gson.toJson(result);
-			}
-			return gson.toJson(result.setResult(ResultType.ERR_VIOLATION));
+	public ResponseResult lookViolation(@ModelAttribute ResponseResult result, 
+			@ModelAttribute("user") Student student, Date from, Date to) {
+		List<ViolationRecord> violationRecords = studentService.lookViolationes(student.getId(), from, to);
+		if (violationRecords != null) {
+			result.setResult(ResultType.SUCCESS).setResult(violationRecords);
+			return result;
 		}
-		return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
+		return result.setResult(ResultType.ERR_VIOLATION);
 	}
 	
 	@RequestMapping(value = "/declareRepair", method = RequestMethod.POST)
-	@ResponseBody
-	public String declareRepair(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, 
-			@ModelAttribute Student student, RepairInformation repairInformation) {
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
+	public ResponseResult declareRepair(@ModelAttribute ResponseResult result, 
+			@ModelAttribute("user") Student student, RepairInformation repairInformation) {
 		if (student.getDormitory() == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_DORMITORY));
+			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
 		studentService.declareRepair(repairInformation, dormitoryId);
-		return gson.toJson(result.setResult(ResultType.SUCCESS));
+		return result.setResult(ResultType.SUCCESS);
 	}
 	
 	@RequestMapping(value = "/lookRepairs", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookRepairs(@ModelAttribute Gson gson, @ModelAttribute ResponseResult result, 
-			@ModelAttribute Student student, Date from, Date to, RepairStatus status) {
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
+	public ResponseResult lookRepairs(@ModelAttribute ResponseResult result, 
+			@ModelAttribute("user") Student student, Date from, Date to, RepairStatus status) {
 		if (student.getDormitory() == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_DORMITORY));
+			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
 		List<RepairInformation> repairInformations = studentService.lookRepairs(dormitoryId, from, to, status);
 		if (repairInformations == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_REPAIR));
+			return result.setResult(ResultType.ERR_REPAIR);
 		}
 		result.setResult(ResultType.SUCCESS).setResult(repairInformations);
-		return gson.toJson(result);
+		return result;
 	}
 	
 	@RequestMapping(value = "/lookNotices", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookNotices(@ModelAttribute Gson gson, @ModelAttribute ResponseResult resultUtil,
-			@ModelAttribute Student student, InformationQueryType queryType, Date from, Date to) {
+	public ResponseResult lookNotices(@ModelAttribute ResponseResult result,
+			@ModelAttribute("user") Student student, InformationQueryType queryType, Date from, Date to) {
 		Integer buildingNum = student.getDormitory().getBuilding().getBuildingNum();
 		List<Notice> notices = studentService.findNoticesBySendDate(buildingNum, from, to);
 		if (notices == null || notices.size() == 0) {
-			return gson.toJson(resultUtil.setResult(ResultType.ERR_NOTICE));
+			result.setResult(ResultType.ERR_NOTICE);
 		}
-		resultUtil.setResult(ResultType.SUCCESS).setResult(notices);
-		return gson.toJson(resultUtil);
+		result.setResult(ResultType.SUCCESS).setResult(notices);
+		return result;
 	}
 	
 	@RequestMapping(value = "/lookInfo", method = RequestMethod.GET)
-	@ResponseBody
-	public String lookInfo(@ModelAttribute Student student, @ModelAttribute Gson gson, 
-			@ModelAttribute ResponseResult result) {
-		if (student == null) {
-			return gson.toJson(result.setResult(ResultType.ERR_LOGIN));
-		}
+	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute ResponseResult result) {
 		student.setViolationRecords(studentService.lookViolationes(student.getId(), null, null));
 		Building building = student.getDormitory().getBuilding();
 		building.setDorAdmins(null);
@@ -227,6 +196,6 @@ public class AppStudentController {
 		dormitory.setStudents(null);
 		dormitory.setBills(null);
 		result.setResult(ResultType.SUCCESS).setResult(student);
-		return gson.toJson(result);
+		return result;
 	}
 }

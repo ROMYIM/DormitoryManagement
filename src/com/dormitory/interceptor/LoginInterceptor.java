@@ -22,18 +22,24 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		// TODO Auto-generated method stub
-		String uri = request.getRequestURI();
-		if (uri.indexOf("login") >= 0) {
-			return true;
-		} 
-		HttpSession session = request.getSession();
-		if (session.getAttribute("user") != null) {
+		System.out.println("LoginInterceptor");
+		String path = request.getServletPath();
+		if (path.indexOf("/") >= 0) {
 			return true;
 		}
-		if (uri.indexOf("app") >= 0) {
+		if (path.indexOf("login") >= 0) {
+			return true;
+		} 
+		HttpSession session = request.getSession(false);
+		if (session != null && session.getAttribute("user") != null) {
+			return true;
+		}
+		if (path.indexOf("app") >= 0) {
 			Gson gson = new Gson();
+			response.setContentType("application/json;charset=utf-8");
 			PrintWriter printWriter = response.getWriter();
 			printWriter.print(gson.toJson(new ResponseResult(ResultType.ERR_LOGIN)));
+			printWriter.flush();
 			printWriter.close();
 		} else {
 			response.sendRedirect("");

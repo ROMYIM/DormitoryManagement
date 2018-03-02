@@ -11,24 +11,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dormitory.constant.ResultType;
 import com.dormitory.entity.ResponseResult;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @ControllerAdvice
 @ResponseBody
 public class ExceptionHandle {
 	
 	private static Logger logger = LoggerFactory.getLogger(ExceptionHandle.class);
-	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	private static ResponseResult result = new ResponseResult();
 
 	public ExceptionHandle() {
 		// TODO Auto-generated constructor stub
-	}
-	
-	@ModelAttribute("gson")
-	public Gson getGson() {
-		return new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd").create();
 	}
 	
 	@ModelAttribute("result")
@@ -37,39 +28,35 @@ public class ExceptionHandle {
 	}
 	
 	@ExceptionHandler(NullPointerException.class)
-	public String queryExeception(NullPointerException exception) {
+	public ResponseResult queryExeception(NullPointerException exception, @ModelAttribute("result") ResponseResult result) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
-		return gson.toJson(result.setResult(ResultType.ERR_QUERY));
+		return result.setResult(ResultType.ERR_QUERY);
 	}
 	
 	@ExceptionHandler(ClassCastException.class)
-	public String classCastException(ClassCastException exception) {
+	public ResponseResult classCastException(ClassCastException exception, @ModelAttribute("result") ResponseResult result) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
-		return gson.toJson(result.setResult(ResultType.ERR_UNKONOWN));
+		return result.setResult(ResultType.ERR_UNKONOWN);
 	}
 	
-	@ExceptionHandler(IllegalArgumentException.class)
-	public String attributeException(IllegalArgumentException exception) {
+	@ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
+	public ResponseResult httpSessionException(Exception exception, @ModelAttribute("result") ResponseResult result) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
-		return gson.toJson(result.setResult(ResultType.ERR_UNKONOWN));
+		return result.setResult(ResultType.ERR_UNKONOWN);
 	}
 	
-	@ExceptionHandler(LazyInitializationException.class)
-	public String hibernateLazyException(LazyInitializationException exception) {
+	@ExceptionHandler(value = {LazyInitializationException.class, QuerySyntaxException.class})
+	public ResponseResult hibernateException(Exception exception, @ModelAttribute("result") ResponseResult result) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
-		return gson.toJson(result.setResult(ResultType.ERR_UNKONOWN));
+		return result.setResult(ResultType.ERR_UNKONOWN);
 	}
 	
-	@ExceptionHandler(QuerySyntaxException.class)
-	public String hqlException(QuerySyntaxException exception) {
-		logger.error(exception.getMessage());
-		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
-		return gson.toJson(result.setResult(ResultType.ERR_UNKONOWN));
-	}
+	
+	
 	
 	
 //	@ExceptionHandler(Exception.class)

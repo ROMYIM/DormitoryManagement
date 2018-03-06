@@ -25,7 +25,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		// TODO Auto-generated method stub
 		System.out.println("AuthInterceptor");
 		String path = request.getServletPath();
-		if (path.indexOf("/") >= 0) {
+		if (path.equals("/")) {
 			return true;
 		}
 		HttpSession session = request.getSession(false);

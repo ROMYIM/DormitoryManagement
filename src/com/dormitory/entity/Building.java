@@ -14,6 +14,9 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "building")
 public class Building implements Serializable {
@@ -24,9 +27,16 @@ public class Building implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@NotNull
 	@Range(min = 1, max = 99)
+	@JsonManagedReference
 	private Integer buildingNum;
+	
+	@JsonBackReference
 	private List<Notice> notices;
+	
+	@JsonBackReference
 	private List<DorAdmin> dorAdmins;
+	
+	@JsonBackReference
 	private List<Dormitory> dormitories;
 
 	public Building() {

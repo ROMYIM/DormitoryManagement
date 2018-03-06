@@ -37,7 +37,6 @@
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
               <constructor-arg value="UTF-8" />
             </bean>
-            <bean class="org.springframework.http.converter.json.GsonHttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
     

@@ -52,7 +52,8 @@ public class BaseDAO<T extends Serializable, PK extends Serializable> implements
 	@Override
 	public List<T> queryAll(Class<T> tClass) {
 		// TODO Auto-generated method stub
-		Query query = sessionFactory.getCurrentSession().createQuery("from" + tClass.getSimpleName());
+		String hql = "from " + tClass.getSimpleName();
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		return query.list();
 	}
 

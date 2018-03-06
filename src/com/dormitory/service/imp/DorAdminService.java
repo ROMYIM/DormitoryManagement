@@ -22,7 +22,6 @@ import com.dormitory.entity.Notice;
 import com.dormitory.entity.Student;
 import com.dormitory.entity.ViolationRecord;
 import com.dormitory.service.IDorAdminService;
-import com.dormitory.util.DateUtil;
 
 @Service("dorAdminService")
 @Transactional
@@ -159,13 +158,13 @@ public class DorAdminService implements IDorAdminService {
 	public List<ViolationRecord> findViolationRecord(String dorAdminId, Date from, Date to) {
 		// TODO Auto-generated method stub
 		if (from == null && to == null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from ViolationRecord v where v.dorAdmin.id = ?", dorAdminId);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from ViolationRecord v where v.dorAdmin.id = ?", dorAdminId);
 		} else if (from == null && to != null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.sendDate <= ?", dorAdminId, to);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.sendDate <= ?", dorAdminId, to);
 		} else if (from != null && to == null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.sendDate >= ?", dorAdminId, from);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.sendDate >= ?", dorAdminId, from);
 		} else if (from != null && to != null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.sendDate between ? and ?", dorAdminId, from, to);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.sendDate between ? and ?", dorAdminId, from, to);
 		}
 		return null;
 	}
@@ -174,13 +173,13 @@ public class DorAdminService implements IDorAdminService {
 	public List<ViolationRecord> findViolationByStudent(String dorAdminId, String studentId, Date from, Date to) {
 		// TODO Auto-generated method stub
 		if (from == null && to == null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from ViolationRecord v where v.dorAdmin.id = ? and v.student.id = ?", dorAdminId, studentId);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from ViolationRecord v where v.dorAdmin.id = ? and v.student.id = ?", dorAdminId, studentId);
 		} else if (from == null && to != null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate <= ?", dorAdminId, studentId, to);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate <= ?", dorAdminId, studentId, to);
 		} else if (from != null && to == null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate >= ?", dorAdminId, studentId, from);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate >= ?", dorAdminId, studentId, from);
 		} else if (from != null && to != null) {
-			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(content, sendDate, type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate between ? and ?", dorAdminId, studentId, from, to);
+			return (List<ViolationRecord>) violationDAO.queryByHQL("select new ViolationRecord(v.id, v.content, v.sendDate, v.type) from Violation v where v.dorAdmin.id = ? and v.student.id = ? and v.sendDate between ? and ?", dorAdminId, studentId, from, to);
 		}
 		return null;
 	}
@@ -195,6 +194,7 @@ public class DorAdminService implements IDorAdminService {
 		}
 		buildings.add(building);
 		notice.setBuildings(buildings);
+		notice.setSendDate(new Date());
 		noticeDAO.saveOrUpdate(notice);
 	}
 
@@ -202,45 +202,50 @@ public class DorAdminService implements IDorAdminService {
 	public List<Notice> findNoticesBySendDate(String id, Date from, Date to) {
 		// TODO Auto-generated method stub
 		Integer buildingNum = findManageBuilding(id).getBuildingNum();
-		String format = "yyyy-MM-dd";
-		StringBuffer hqlBuffer = new StringBuffer("select new Notice(sendDate, content) from Notice n join n.buildings b where b.buildingNum = ");
-		hqlBuffer.append(buildingNum);
+		StringBuffer hqlBuffer = new StringBuffer("select new Notice(n.id, n.sendDate, n.content) from Notice n join n.buildings b where b.buildingNum = ?");
 		if (from == null && to == null) {
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum);
 		} else if (from == null && to != null) {
-			hqlBuffer.append(" and n.sendDate <= to_date('").append(DateUtil.dateToString(to, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.sendDate <= ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, to);
 		} else if (from != null && to == null) {
-			hqlBuffer.append(" and n.sendDate >= to_date('").append(DateUtil.dateToString(from, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.sendDate >= ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, from);
 		} else if (from != null && to != null) {
-			hqlBuffer.append(" and n.sendDate between to_date('").append(DateUtil.dateToString(from, format)).append("', '")
-			.append(format).append("') and to_date('").append(DateUtil.dateToString(to, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.sendDate between ? and ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, from, to);
 		}
-		return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString());
+		return null;
 	}
 
 	@Override
 	public List<Notice> findNoticesByDeadline(String id, Date from, Date to) {
 		// TODO Auto-generated method stub
 		Integer buildingNum = findManageBuilding(id).getBuildingNum();
-		String format = "yyyy-MM-dd";
-		StringBuffer hqlBuffer = new StringBuffer("select new Notice(sendDate, content) from Notice n join n.buildings b where b.building = ");
-		hqlBuffer.append(buildingNum);
+		StringBuffer hqlBuffer = new StringBuffer("select new Notice(n.id n.sendDate, n.content) from Notice n join n.buildings b where b.buildingNum = ?");
 		if (from == null && to == null) {
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum);
 		} else if (from == null && to != null) {
-			hqlBuffer.append(" and n.deadline <= to_date('").append(DateUtil.dateToString(to, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.deadline <= ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, to);
 		} else if (from != null && to == null) {
-			hqlBuffer.append(" and n.deadline >= to_date('").append(DateUtil.dateToString(from, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.deadline >= ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, from);
 		} else if (from != null && to != null) {
-			hqlBuffer.append(" and n.deadline between to_date('").append(DateUtil.dateToString(from, format)).append("', '")
-			.append(format).append("') and to_date('").append(DateUtil.dateToString(to, format)).append("', '").append(format).append("')");
+			hqlBuffer.append(" and n.deadline between ? and ?");
+			return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString(), buildingNum, from, to);
 		}
-		return (List<Notice>) noticeDAO.queryByHQL(hqlBuffer.toString());
+		return null;
 	}
 
 	@Override
 	public List<Notice> findNotices(String id, Date sendDate, Date deadline) {
 		// TODO Auto-generated method stub
 		Integer buildingNum = findManageBuilding(id).getBuildingNum();
-		return (List<Notice>) noticeDAO.queryByHQL("select new Notice(sendDate, content) from Notice n join n.buildings b where n.sendDate = ? and n.deadline = ? and b.building = ?", sendDate, deadline, buildingNum);
+		if (buildingNum != null) {
+			return (List<Notice>) noticeDAO.queryByHQL("select new Notice(n.id, n.sendDate, n.content) from Notice n join n.buildings b where n.sendDate = ? and n.deadline = ? and b.buildingNum = ?", sendDate, deadline, buildingNum);
+		}
+		return null;
 	}
 
 

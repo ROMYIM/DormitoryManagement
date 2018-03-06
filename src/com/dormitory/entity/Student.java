@@ -19,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "student")
 public class Student extends User {
@@ -37,17 +39,24 @@ public class Student extends User {
 	@Min(value = 2014)
 	private Integer grade;
 	
-	@DateTimeFormat(style = "yyyy-MM-dd")
+	@DateTimeFormat(style = "yyyy-MM-dd") 
 	private Date checkInDate;
 	
 	@DateTimeFormat(style = "yyyy-MM-dd")
 	private Date moveDate;
 	private Dormitory dormitory;
-	private List<ViolationRecord> violationRecords;
+	@JsonBackReference
+	private List<ViolationRecord> violationRecords = new ArrayList<>();
 	
 	public Student() {
 		// TODO Auto-generated constructor stub
-		this.violationRecords = new ArrayList<>();
+	}
+	
+	public Student(String id, String name, String major, Integer grade, Date checkInDate) {
+		setId(id);
+		setName(name);
+		setMajor(major);
+		setCheckInDate(checkInDate);
 	}
 		
 	public void setMajor(String major) {

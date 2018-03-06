@@ -24,7 +24,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 		// TODO Auto-generated method stub
 		System.out.println("LoginInterceptor");
 		String path = request.getServletPath();
-		if (path.indexOf("/") >= 0) {
+		if (path.equals("/")) {
 			return true;
 		}
 		if (path.indexOf("login") >= 0) {

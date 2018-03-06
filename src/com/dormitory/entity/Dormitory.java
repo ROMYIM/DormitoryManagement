@@ -23,6 +23,8 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "dormitory")
 public class Dormitory implements Serializable {
@@ -55,8 +57,13 @@ public class Dormitory implements Serializable {
 	@NumberFormat(style = Style.CURRENCY)
 	private Float wbills;
 	
+	@JsonBackReference
 	private List<Student> students = new ArrayList<>();
+	
+	@JsonBackReference
 	private List<RepairInformation> repairInformations = new ArrayList<>();
+	
+	@JsonBackReference
 	private List<Bill> bills = new ArrayList<>();
 
 	public Dormitory() {

@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import com.dormitory.constant.Authentication;
 import com.dormitory.constant.Gender;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @MappedSuperclass
 public class User implements Serializable {
@@ -33,6 +34,7 @@ public class User implements Serializable {
 	
 	@NotEmpty(message = "{password.not.empty}")
 	@Length(min = 6, message = "{password.length.error}")
+	@JsonBackReference
 	private String password;
 	
 	@NotNull(message = "{gender.not.empty}")

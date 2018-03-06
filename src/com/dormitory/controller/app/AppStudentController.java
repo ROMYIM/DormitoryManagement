@@ -65,7 +65,7 @@ public class AppStudentController {
 	
 	@RequestMapping(value = "/login", headers = "isFirst", method = RequestMethod.POST)
 	public ResponseResult login(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student,
-			@RequestHeader("isFirst") Boolean isFirst, @Valid User user, Errors errors, 
+			@RequestHeader(value = "isFirst", defaultValue = "true") Boolean isFirst, @Valid User user, Errors errors, 
 			HttpSession session, HttpServletResponse response) {
 		if (errors.hasErrors()) {
 			return result.setResult(ResultType.ERR_LOGIN);

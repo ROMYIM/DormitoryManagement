@@ -25,29 +25,36 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		// TODO Auto-generated method stub
 		System.out.println("AuthInterceptor");
 		String path = request.getServletPath();
-		if (path.indexOf("/") >= 0) {
+		if (path.equals("/")) {
+			return true;
+		}
+		if (path.indexOf("login") >= 0) {
 			return true;
 		}
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute("user");
-		switch (user.getAuthentication()) {
-		case STUDENT:
-			if (path.indexOf("student") >= 0) {
-				return true;
+		if (session != null) {
+			User user = (User) session.getAttribute("user");
+			if (user != null) {
+				switch (user.getAuthentication()) {
+				case STUDENT:
+					if (path.indexOf("student") >= 0) {
+						return true;
+					}
+					break;
+				case DORMITORY_ADMINISTRATOR:
+					if (path.indexOf("dorAdmin") >= 0) {
+						return true;
+					}
+					break;
+				case ADMINISTRATOR:
+					if (path.indexOf("admin") >= 0) {
+						return true;
+					}
+					break;
+				default:
+					break;
+				}
 			}
-			break;
-		case DORMITORY_ADMINISTRATOR:
-			if (path.indexOf("dorAdmin") >= 0) {
-				return true;
-			}
-			break;
-		case ADMINISTRATOR:
-			if (path.indexOf("admin") >= 0) {
-				return true;
-			}
-			break;
-		default:
-			break;
 		}
 		response.setContentType("application/json;charset=utf-8");
 		Gson gson = new Gson();

@@ -55,11 +55,11 @@ public class AppStudentController {
 	@ModelAttribute("user")
 	public Student initStudent(@CookieValue(value = "id", required = false) String id, 
 			@RequestParam(value = "id", required = false) String studentId) {
-		if (id != null && id.length() > 0) {
-			return studentService.findStudentById(id);
-		} else if (studentId != null && studentId.length() > 0) {
+		if (studentId != null && studentId.length() > 0) {
 			return studentService.findStudentById(studentId);
-		}
+		} else if (id != null && id.length() > 0) {
+			return studentService.findStudentById(id);
+		}  
 		return null;
 	}
 	

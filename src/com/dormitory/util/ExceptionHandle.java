@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dormitory.entity.ResponseResult;
 
 @ControllerAdvice
-@ResponseBody
 public class ExceptionHandle {
 	
 	private static Logger logger = LoggerFactory.getLogger(ExceptionHandle.class);

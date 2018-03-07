@@ -49,10 +49,10 @@ public class AppDorAdminController {
 	@ModelAttribute("user")
 	public DorAdmin initDorAdmin(@CookieValue(value = "id", required = false) String id,
 			@RequestParam(value = "id", required = false) String dorAdminId) {
-		if (id != null && id.length() > 0) {
-			return dorAdminService.findDorAdminById(id);
-		} else if (dorAdminId != null && dorAdminId.length() > 0) {
+		if (dorAdminId != null && dorAdminId.length() > 0) {
 			return dorAdminService.findDorAdminById(dorAdminId);
+		} else if (id != null && id.length() > 0) {
+			return dorAdminService.findDorAdminById(id);
 		}
 		return null;
 	}

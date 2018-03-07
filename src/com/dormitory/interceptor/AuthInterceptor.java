@@ -31,9 +31,6 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		if (path.indexOf("login") >= 0) {
 			return true;
 		}
-		if (path.indexOf("login") >= 0) {
-			return true;
-		}
 		HttpSession session = request.getSession(false);
 		if (session != null) {
 			User user = (User) session.getAttribute("user");

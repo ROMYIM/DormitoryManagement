@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,7 +40,7 @@ public class Bill implements Serializable {
 	private Integer id;
 	
 	@NotNull
-	@DateTimeFormat(style = "yyyy-mm-dd hh:MM:ss")
+	@DateTimeFormat(style = "yyyy-mm-dd")
 	private Date payDate;
 	
 	@NotNull
@@ -83,8 +82,8 @@ public class Bill implements Serializable {
 		this.payDate = payDate;
 	}
 	
-	@Column(name = "pay_date", nullable = false, updatable = false, columnDefinition = "datetime")
-	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "pay_date", nullable = false, updatable = false, columnDefinition = "date")
+	@Temporal(TemporalType.DATE)
 	public Date getPayDate() {
 		return payDate;
 	}
@@ -93,7 +92,7 @@ public class Bill implements Serializable {
 		this.dormitory = dormitory;
 	}
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "dormitory_id")
 	public Dormitory getDormitory() {
 		return dormitory;

@@ -55,11 +55,11 @@ public class AppStudentController {
 	@ModelAttribute("user")
 	public Student initStudent(@CookieValue(value = "id", required = false) String id, 
 			@RequestParam(value = "id", required = false) String studentId) {
-		if (id != null && id.length() > 0) {
-			return studentService.findStudentById(id);
-		} else if (studentId != null && studentId.length() > 0) {
+		if (studentId != null && studentId.length() > 0) {
 			return studentService.findStudentById(studentId);
-		}
+		} else if (id != null && id.length() > 0) {
+			return studentService.findStudentById(id);
+		} 
 		return null;
 	}
 	
@@ -90,7 +90,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ResponseResult register(@ModelAttribute ResponseResult result, Student student) {
+	public ResponseResult register(@ModelAttribute("result") ResponseResult result, Student student) {
 		if (studentService.findStudentById(student.getId()) != null) {
 			return result.setResult(ResultType.AL_REGISTER);
 		}
@@ -100,7 +100,7 @@ public class AppStudentController {
 	
 	@RequestMapping(value = "/payBills/{billType}", params = "bills", method = RequestMethod.POST)
 	public ResponseResult payBills(@PathVariable BillType billType, @ModelAttribute("user") Student student,
-			@ModelAttribute ResponseResult result, @RequestParam(defaultValue = "0") Float bills) {
+			@ModelAttribute("result") ResponseResult result, @RequestParam(defaultValue = "0") Float bills) {
 		Dormitory dormitory = student.getDormitory();
 		if (dormitory == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -110,7 +110,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookBill", method = RequestMethod.GET)
-	public ResponseResult lookBill(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
+	public ResponseResult lookBill(@ModelAttribute("result") ResponseResult result, @ModelAttribute("user") Student student, 
 			Model model) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -124,7 +124,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookBills", method = RequestMethod.GET)
-	public ResponseResult lookBills(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
+	public ResponseResult lookBills(@ModelAttribute("result") ResponseResult result, @ModelAttribute("user") Student student, 
 			BillType type, Date from, Date to) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -136,7 +136,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookViolations", method = RequestMethod.GET)
-	public ResponseResult lookViolation(@ModelAttribute ResponseResult result, 
+	public ResponseResult lookViolation(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, Date from, Date to) {
 		List<ViolationRecord> violationRecords = studentService.lookViolationes(student.getId(), from, to);
 		if (violationRecords != null) {
@@ -147,7 +147,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/declareRepair", method = RequestMethod.POST)
-	public ResponseResult declareRepair(@ModelAttribute ResponseResult result, 
+	public ResponseResult declareRepair(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, RepairInformation repairInformation) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -158,7 +158,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookRepairs", method = RequestMethod.GET)
-	public ResponseResult lookRepairs(@ModelAttribute ResponseResult result, 
+	public ResponseResult lookRepairs(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, Date from, Date to, RepairStatus status) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -173,7 +173,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookNotices", method = RequestMethod.GET)
-	public ResponseResult lookNotices(@ModelAttribute ResponseResult result,
+	public ResponseResult lookNotices(@ModelAttribute("result") ResponseResult result,
 			@ModelAttribute("user") Student student, InformationQueryType queryType, Date from, Date to) {
 		Integer buildingNum = student.getDormitory().getBuilding().getBuildingNum();
 		List<Notice> notices = studentService.findNoticesBySendDate(buildingNum, from, to);
@@ -185,7 +185,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookInfo", method = RequestMethod.GET)
-	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute ResponseResult result) {
+	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute("result") ResponseResult result) {
 		student.setViolationRecords(studentService.lookViolationes(student.getId(), null, null));
 		Building building = student.getDormitory().getBuilding();
 		building.setDorAdmins(null);

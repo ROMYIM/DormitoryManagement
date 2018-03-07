@@ -105,7 +105,8 @@ public class AppDorAdminController {
 	}
 	
 	@RequestMapping(value = "/lookStudent/{studentId}", method = RequestMethod.GET)
-	public ResponseResult lookStudentById(@PathVariable("studentId") String studentId, @ModelAttribute("result") ResponseResult resultUtil) {
+	public ResponseResult lookStudentById(@PathVariable("studentId") String studentId, 
+			@ModelAttribute("result") ResponseResult resultUtil) {
 		Student student = dorAdminService.findStudentById(studentId);
 		if (student != null) {
 			student.setViolationRecords(null);

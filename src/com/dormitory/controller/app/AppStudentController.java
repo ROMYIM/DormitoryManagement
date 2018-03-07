@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.dormitory.constant.BillType;
 import com.dormitory.constant.InformationQueryType;
@@ -153,6 +154,7 @@ public class AppStudentController {
 			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
+		repairInformation.setSendDate(new Date());
 		studentService.declareRepair(repairInformation, dormitoryId);
 		return result.setResult(ResultType.SUCCESS);
 	}
@@ -197,5 +199,21 @@ public class AppStudentController {
 		dormitory.setBills(null);
 		result.setResult(ResultType.SUCCESS).setResult(student);
 		return result;
+	}
+	
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public ResponseResult logout(@ModelAttribute("result") ResponseResult result, SessionStatus status, HttpServletResponse response) {
+		status.setComplete();
+		if (status.isComplete()) {
+			Cookie idCookie = CookieUtil.setCookie("id", null, 7 * 24 * 60 * 60);
+			Cookie passwordCookie = CookieUtil.setCookie("password", null, 7 * 24 * 60 * 60);
+			Cookie authCookie = CookieUtil.setCookie("authentication", null, 7 * 24 * 60 * 60);
+			response.addCookie(idCookie);
+			response.addCookie(passwordCookie);
+			response.addCookie(authCookie);
+			return result.setResult(ResultType.SUCCESS);
+		} else {
+			return result.setResult(ResultType.ERR_UNKONOWN);
+		}
 	}
 }

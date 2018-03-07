@@ -26,12 +26,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		System.out.println("AuthInterceptor");
 		String path = request.getServletPath();
 		if (path.equals("/")) {
-<<<<<<< HEAD
 			return true;
 		}
 		if (path.indexOf("login") >= 0) {
-=======
->>>>>>> branch 'master' of https://github.com/ROMYIM/DormitoryManagement.git
 			return true;
 		}
 		HttpSession session = request.getSession(false);

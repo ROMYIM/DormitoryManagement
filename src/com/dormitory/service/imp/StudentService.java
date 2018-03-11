@@ -117,6 +117,8 @@ public class StudentService implements IStudentService {
 			}
 			dormitory.setWbills(wBill);
 		}
+		Bill billRecord = new Bill(new Date(), billType, bill, dormitory);
+		billDAO.save(billRecord);
 		dormitoryDAO.update(dormitory);
 	}
 

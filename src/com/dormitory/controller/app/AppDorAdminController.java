@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.dormitory.constant.InformationQueryType;
 import com.dormitory.constant.ResultType;
@@ -142,7 +143,7 @@ public class AppDorAdminController {
 	public ResponseResult lookViolation(@ModelAttribute("user") DorAdmin dorAdmin, @ModelAttribute("result") ResponseResult resultUtil,
 			@RequestParam(value = "studentId", required = false) String studentId, Date from, Date to) {
 		List<ViolationRecord> violationRecords = null;
-		if (studentId == null) {
+		if (studentId != null) {
 			violationRecords = dorAdminService.findViolationByStudent(dorAdmin.getId(), studentId, from, to);
 		} else {
 			violationRecords = dorAdminService.findViolationRecord(dorAdmin.getId(), from, to);
@@ -196,5 +197,21 @@ public class AppDorAdminController {
 		}
 		resultUtil.setResult(ResultType.SUCCESS).setResult(notices);
 		return resultUtil;
+	}
+	
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public ResponseResult logout(@ModelAttribute("result") ResponseResult result, SessionStatus status, HttpServletResponse response) {
+		status.setComplete();
+		if (status.isComplete()) {
+			Cookie idCookie = CookieUtil.setCookie("id", null, 7 * 24 * 60 * 60);
+			Cookie passwordCookie = CookieUtil.setCookie("password", null, 7 * 24 * 60 * 60);
+			Cookie authCookie = CookieUtil.setCookie("authentication", null, 7 * 24 * 60 * 60);
+			response.addCookie(idCookie);
+			response.addCookie(passwordCookie);
+			response.addCookie(authCookie);
+			return result.setResult(ResultType.SUCCESS);
+		} else {
+			return result.setResult(ResultType.ERR_UNKONOWN);
+		}
 	}
 }

@@ -27,7 +27,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 		if (path.equals("/")) {
 			return true;
 		}
-		if (path.indexOf("login") >= 0) {
+		if (path.indexOf("login") >= 0 || path.indexOf("register") >= 0) {
 			return true;
 		} 
 		HttpSession session = request.getSession(false);

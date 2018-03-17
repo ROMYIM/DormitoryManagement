@@ -44,7 +44,7 @@ public class AppAdminController {
 	}
 	
 	@ModelAttribute("user")
-	public Administrator initStudent(@CookieValue(value = "id", required = false) String id, 
+	public Administrator initAdmin(@CookieValue(value = "id", required = false) String id, 
 			@RequestParam(value = "id", required = false) String adminId) {
 		if (adminId != null && adminId.length() > 0) {
 			return administratorService.findAdminById(adminId);

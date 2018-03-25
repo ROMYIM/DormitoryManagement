@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.dormitory.constant.ResultType;
 import com.dormitory.entity.Administrator;
@@ -121,8 +122,11 @@ public class AppAdminController {
 			@RequestParam("studentId") String studentId, @RequestParam("dormitoryId") String dormitoryId) {
 		Student student = administratorService.findStudentInfo(studentId);
 		if (student != null) {
-			administratorService.studentEnterDormitory(student, dormitoryId);
-			return resultUtil.setResult(ResultType.SUCCESS);
+			boolean flag = administratorService.studentEnterDormitory(student, dormitoryId);
+			if (flag) {
+				return resultUtil.setResult(ResultType.SUCCESS);
+			}
+			return resultUtil.setResult(ResultType.ERR_DORMITORY);
 		}
 		return resultUtil.setResult(ResultType.ERR_STUDENT);
 	}
@@ -178,4 +182,19 @@ public class AppAdminController {
 		return resultUtil.setResult(ResultType.SUCCESS);
 	}
 
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public ResponseResult logout(@ModelAttribute("result") ResponseResult result, SessionStatus status, HttpServletResponse response) {
+		status.setComplete();
+		if (status.isComplete()) {
+			Cookie idCookie = CookieUtil.setCookie("id", null, 7 * 24 * 60 * 60);
+			Cookie passwordCookie = CookieUtil.setCookie("password", null, 7 * 24 * 60 * 60);
+			Cookie authCookie = CookieUtil.setCookie("authentication", null, 7 * 24 * 60 * 60);
+			response.addCookie(idCookie);
+			response.addCookie(passwordCookie);
+			response.addCookie(authCookie);
+			return result.setResult(ResultType.SUCCESS);
+		} else {
+			return result.setResult(ResultType.ERR_UNKONOWN);
+		}
+	}
 }

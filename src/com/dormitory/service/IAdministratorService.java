@@ -33,7 +33,7 @@ public interface IAdministratorService {
 	
 	public void removeStudentInfoById(String studentId);
 	
-	public void studentEnterDormitory(Student student, String dormitoryId);
+	public boolean studentEnterDormitory(Student student, String dormitoryId);
 	
 	public void studentLeaveDormitory(Student student);
 	

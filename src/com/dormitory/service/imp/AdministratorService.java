@@ -116,13 +116,16 @@ public class AdministratorService implements IAdministratorService {
 	}
 
 	@Override
-	public void studentEnterDormitory(Student student, String dormitoryId) {
+	public boolean studentEnterDormitory(Student student, String dormitoryId) {
 		// TODO Auto-generated method stub
 		Dormitory dormitory = dormitoryDAO.queryById(Dormitory.class, dormitoryId);
-		if (dormitory != null && student.getDormitory() == null) {
+		if (dormitory != null) {
 			student.setDormitory(dormitory);
 			student.setCheckInDate(new Date());
 			studentDAO.saveOrUpdate(student);
+			return true;
+		} else {
+			return false;
 		}
 	}
 

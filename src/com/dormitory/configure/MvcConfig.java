@@ -7,15 +7,13 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 @Configuration
 @EnableWebMvc
-public class MvcConfig extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
+public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	public MvcConfig() {
 		// TODO Auto-generated constructor stub
@@ -28,12 +26,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter implements WebSocketConfi
 		GsonHttpMessageConverter gsonConverter = new GsonHttpMessageConverter();
 		gsonConverter.setGson(gson);
 		converters.add(gsonConverter);
-	}
-
-	@Override
-	public void registerWebSocketHandlers(WebSocketHandlerRegistry arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

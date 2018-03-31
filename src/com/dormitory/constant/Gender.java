@@ -1,7 +1,7 @@
 package com.dormitory.constant;
 
 public enum Gender {
-	MALE("ÄÐ"), FALE("Å®");
+	MALE("ÄÐ"), FEMALE("Å®");
 	
 	private final String value;
 	

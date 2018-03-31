@@ -25,25 +25,26 @@ public class ExceptionHandle {
 	}
 	
 	@ExceptionHandler(NullPointerException.class)
-	public void queryExeception(NullPointerException exception, @ModelAttribute("result") ResponseResult result) {
+	public void queryExeception(NullPointerException exception) {
 		logger.error(exception.getMessage());
+		exception.printStackTrace();
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
 	}
 	
 	@ExceptionHandler(ClassCastException.class)
-	public void classCastException(ClassCastException exception, @ModelAttribute("result") ResponseResult result) {
+	public void classCastException(ClassCastException exception) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
 	}
 	
 	@ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
-	public void httpSessionException(Exception exception, @ModelAttribute("result") ResponseResult result) {
+	public void httpSessionException(Exception exception) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
 	}
 	
 	@ExceptionHandler(value = {LazyInitializationException.class, QuerySyntaxException.class})
-	public void hibernateException(Exception exception, @ModelAttribute("result") ResponseResult result) {
+	public void hibernateException(Exception exception) {
 		logger.error(exception.getMessage());
 		System.out.println(exception.getClass().getSimpleName() + ":" + exception.getMessage());
 	}

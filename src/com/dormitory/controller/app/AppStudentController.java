@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.dormitory.constant.BillType;
 import com.dormitory.constant.InformationQueryType;
@@ -59,7 +60,7 @@ public class AppStudentController {
 			return studentService.findStudentById(studentId);
 		} else if (id != null && id.length() > 0) {
 			return studentService.findStudentById(id);
-		}  
+		} 
 		return null;
 	}
 	
@@ -90,7 +91,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ResponseResult register(@ModelAttribute ResponseResult result, Student student) {
+	public ResponseResult register(@ModelAttribute("result") ResponseResult result, Student student) {
 		if (studentService.findStudentById(student.getId()) != null) {
 			return result.setResult(ResultType.AL_REGISTER);
 		}
@@ -100,7 +101,7 @@ public class AppStudentController {
 	
 	@RequestMapping(value = "/payBills/{billType}", params = "bills", method = RequestMethod.POST)
 	public ResponseResult payBills(@PathVariable BillType billType, @ModelAttribute("user") Student student,
-			@ModelAttribute ResponseResult result, @RequestParam(defaultValue = "0") Float bills) {
+			@ModelAttribute("result") ResponseResult result, @RequestParam(defaultValue = "0") Float bills) {
 		Dormitory dormitory = student.getDormitory();
 		if (dormitory == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -110,7 +111,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookBill", method = RequestMethod.GET)
-	public ResponseResult lookBill(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
+	public ResponseResult lookBill(@ModelAttribute("result") ResponseResult result, @ModelAttribute("user") Student student, 
 			Model model) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -124,7 +125,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookBills", method = RequestMethod.GET)
-	public ResponseResult lookBills(@ModelAttribute ResponseResult result, @ModelAttribute("user") Student student, 
+	public ResponseResult lookBills(@ModelAttribute("result") ResponseResult result, @ModelAttribute("user") Student student, 
 			BillType type, Date from, Date to) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -136,7 +137,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookViolations", method = RequestMethod.GET)
-	public ResponseResult lookViolation(@ModelAttribute ResponseResult result, 
+	public ResponseResult lookViolation(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, Date from, Date to) {
 		List<ViolationRecord> violationRecords = studentService.lookViolationes(student.getId(), from, to);
 		if (violationRecords != null) {
@@ -147,18 +148,19 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/declareRepair", method = RequestMethod.POST)
-	public ResponseResult declareRepair(@ModelAttribute ResponseResult result, 
+	public ResponseResult declareRepair(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, RepairInformation repairInformation) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
 		}
 		String dormitoryId = student.getDormitory().getDormitoryId();
+		repairInformation.setSendDate(new Date());
 		studentService.declareRepair(repairInformation, dormitoryId);
 		return result.setResult(ResultType.SUCCESS);
 	}
 	
 	@RequestMapping(value = "/lookRepairs", method = RequestMethod.GET)
-	public ResponseResult lookRepairs(@ModelAttribute ResponseResult result, 
+	public ResponseResult lookRepairs(@ModelAttribute("result") ResponseResult result, 
 			@ModelAttribute("user") Student student, Date from, Date to, RepairStatus status) {
 		if (student.getDormitory() == null) {
 			return result.setResult(ResultType.ERR_DORMITORY);
@@ -173,7 +175,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookNotices", method = RequestMethod.GET)
-	public ResponseResult lookNotices(@ModelAttribute ResponseResult result,
+	public ResponseResult lookNotices(@ModelAttribute("result") ResponseResult result,
 			@ModelAttribute("user") Student student, InformationQueryType queryType, Date from, Date to) {
 		Integer buildingNum = student.getDormitory().getBuilding().getBuildingNum();
 		List<Notice> notices = studentService.findNoticesBySendDate(buildingNum, from, to);
@@ -185,7 +187,7 @@ public class AppStudentController {
 	}
 	
 	@RequestMapping(value = "/lookInfo", method = RequestMethod.GET)
-	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute ResponseResult result) {
+	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute("result") ResponseResult result) {
 		student.setViolationRecords(studentService.lookViolationes(student.getId(), null, null));
 		Building building = student.getDormitory().getBuilding();
 		building.setDorAdmins(null);
@@ -197,5 +199,21 @@ public class AppStudentController {
 		dormitory.setBills(null);
 		result.setResult(ResultType.SUCCESS).setResult(student);
 		return result;
+	}
+	
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public ResponseResult logout(@ModelAttribute("result") ResponseResult result, SessionStatus status, HttpServletResponse response) {
+		status.setComplete();
+		if (status.isComplete()) {
+			Cookie idCookie = CookieUtil.setCookie("id", null, 7 * 24 * 60 * 60);
+			Cookie passwordCookie = CookieUtil.setCookie("password", null, 7 * 24 * 60 * 60);
+			Cookie authCookie = CookieUtil.setCookie("authentication", null, 7 * 24 * 60 * 60);
+			response.addCookie(idCookie);
+			response.addCookie(passwordCookie);
+			response.addCookie(authCookie);
+			return result.setResult(ResultType.SUCCESS);
+		} else {
+			return result.setResult(ResultType.ERR_UNKONOWN);
+		}
 	}
 }

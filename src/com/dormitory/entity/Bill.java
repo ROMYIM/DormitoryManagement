@@ -35,8 +35,7 @@ public class Bill implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	@NotNull 
+	 
 	private Integer id;
 	
 	@NotNull
@@ -58,6 +57,13 @@ public class Bill implements Serializable {
 
 	public Bill() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public Bill(Date payDate, BillType type, Float payMoney, Dormitory dormitory) {
+		setPayDate(payDate);
+		setType(type);
+		setPayMoney(payMoney);
+		setDormitory(dormitory);
 	}
 	
 	public Bill(Integer id, Date payDate, BillType type, Float payMoney) {

@@ -81,7 +81,7 @@ public class User implements Serializable {
 		this.gender = gender;
 	}
 	
-	@Enumerated(EnumType.ORDINAL)
+	@Enumerated(EnumType.STRING)
 	@Column(name = "auth", nullable = false, updatable = false)
 	public Authentication getAuthentication() {
 		return authentication;

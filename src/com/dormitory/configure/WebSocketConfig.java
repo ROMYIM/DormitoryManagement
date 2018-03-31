@@ -107,6 +107,5 @@ public class WebSocketConfig implements WebSocketConfigurer {
 			// TODO Auto-generated method stub
 			return false;
 		}
-	}
-
+	}		
 }

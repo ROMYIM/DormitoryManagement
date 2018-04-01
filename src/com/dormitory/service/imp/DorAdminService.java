@@ -100,7 +100,7 @@ public class DorAdminService implements IDorAdminService {
 	@Override
 	public List<Student> findStudentsByDormitory(String dormitoryId) {
 		// TODO Auto-generated method stub
-		return (List<Student>) studentDAO.queryByHQL("select new Student(id, name, major, grade, checkInDate)"
+		return (List<Student>) studentDAO.queryByHQL("select new Student(s.id, s.name, s.major, s.grade, s.checkInDate)"
 				+ " from Student s where s.dormitory.dormitoryId = ?", dormitoryId);
 	}
 

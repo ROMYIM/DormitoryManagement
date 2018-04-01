@@ -74,7 +74,7 @@ public class WorkerService implements IWorkerService {
 		// TODO Auto-generated method stub
 		String format = "yyyy-MM-dd";
 		StringBuffer hqlBuffer = new StringBuffer(300);
-		hqlBuffer.append("select new RepairInformation(type, status, content, sendDate) from RepairInformation r where r.worker.id = ")
+		hqlBuffer.append("select new RepairInformation(r.type, r.status, r.content, r.sendDate) from RepairInformation r where r.worker.id = ")
 		.append(id);
 		if (status != null) {
 			hqlBuffer.append(" and r.status = ").append(status);

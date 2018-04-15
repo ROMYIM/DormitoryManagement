@@ -1,16 +1,15 @@
 package com.dormitory.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.Table;
 
 import com.dormitory.constant.MessageStatus;
 
@@ -19,6 +18,8 @@ import com.dormitory.constant.MessageStatus;
 *@date:  2018年3月31日下午1:30:30
 *@description:   
 */
+@Entity
+@Table(name = "message")
 public class Message implements Serializable {
 
 	/**
@@ -31,21 +32,21 @@ public class Message implements Serializable {
 	private String receiverId;
 	private MessageStatus status;
 	private String content;
-	private Date sendDate;
+	private String sendDate;
 	
 
 	public Message() {
 		super();
 	}
 
-	public Message(String senderId, String content, Date sendDate) {
+	public Message(String senderId, String content, String sendDate) {
 		super();
 		this.senderId = senderId;
 		this.content = content;
 		this.sendDate = sendDate;
 	}
 
-	public Message(String senderId, String receiverId, String content, Date sendDate) {
+	public Message(String senderId, String receiverId, String content, String sendDate) {
 		super();
 		this.senderId = senderId;
 		this.receiverId = receiverId;
@@ -102,12 +103,11 @@ public class Message implements Serializable {
 	}
 	
 	@Column(name = "send_date", nullable = false, updatable = false, columnDefinition = "datetime")
-	@Temporal(TemporalType.TIMESTAMP)
-	public Date getSendDate() {
+	public String getSendDate() {
 		return sendDate;
 	}
 
-	public void setSendDate(Date sendDate) {
+	public void setSendDate(String sendDate) {
 		this.sendDate = sendDate;
 	}
 }

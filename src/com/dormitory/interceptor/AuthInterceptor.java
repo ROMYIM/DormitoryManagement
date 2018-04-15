@@ -25,7 +25,8 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		// TODO Auto-generated method stub
 		System.out.println("AuthInterceptor");
 		String path = request.getServletPath();
-		if (path.equals("/")) {
+		System.out.println(path);
+		if (path.equals("/") || path.equals("/webSocket")) {
 			return true;
 		}
 		if (path.indexOf("login") >= 0 || path.indexOf("register") >= 0) {

@@ -5,16 +5,15 @@ package com.dormitory.service;
 *@description:   
 */
 
-import java.util.Date;
 import java.util.List;
 
 import com.dormitory.entity.Message;
 
 public interface IMessageService {
 
-	List<Message> findUnSendMessages(String receiverId);
+	List<Message> findUnSendMessagesGroupBySender(String receiverId);
 	
-	List<Message> findMessagsBySendDate(String senderId, String receiverId, Date sendDate);
+	List<Message> findMessagsBySendDate(String targetId, String ownerId, String sendDate);
 	
 	void addMessage(Message message);
 }

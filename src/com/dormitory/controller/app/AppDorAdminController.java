@@ -26,12 +26,14 @@ import com.dormitory.constant.InformationQueryType;
 import com.dormitory.constant.ResultType;
 import com.dormitory.entity.DorAdmin;
 import com.dormitory.entity.Dormitory;
+import com.dormitory.entity.Message;
 import com.dormitory.entity.Notice;
 import com.dormitory.entity.ResponseResult;
 import com.dormitory.entity.Student;
 import com.dormitory.entity.User;
 import com.dormitory.entity.ViolationRecord;
 import com.dormitory.service.IDorAdminService;
+import com.dormitory.service.IMessageService;
 import com.dormitory.util.CookieUtil;
 
 @Controller
@@ -42,6 +44,9 @@ public class AppDorAdminController {
 
 	@Resource(name = "dorAdminService")
 	private IDorAdminService dorAdminService;
+	
+	@Resource(name = "messageService")
+	private IMessageService messageService;
 	
 	public AppDorAdminController() {
 		// TODO Auto-generated constructor stub
@@ -197,6 +202,21 @@ public class AppDorAdminController {
 		}
 		resultUtil.setResult(ResultType.SUCCESS).setResult(notices);
 		return resultUtil;
+	}
+	
+	@RequestMapping(value = "getMessageSender", method = RequestMethod.GET)
+	public ResponseResult getMessageSenders(@ModelAttribute("user") DorAdmin dorAdmin, @ModelAttribute("result") ResponseResult result) {
+		List<Message> messages =  messageService.findUnSendMessagesGroupBySender(dorAdmin.getId());
+		result.setResult(ResultType.SUCCESS).setResult(messages);
+		return result;
+	}
+	
+	@RequestMapping(value = "/getMessage", method = RequestMethod.GET)
+	public ResponseResult getMessage(@ModelAttribute("user") DorAdmin dorAdmin, @ModelAttribute("result") ResponseResult result, 
+			String receiverId, String sendDate) {
+		List<Message> messages = messageService.findMessagsBySendDate(dorAdmin.getId(), receiverId, sendDate);
+		result.setResult(ResultType.SUCCESS).setResult(messages);
+		return result;
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)

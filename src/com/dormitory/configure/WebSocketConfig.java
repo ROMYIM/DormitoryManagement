@@ -9,29 +9,34 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.dormitory.constant.MessageStatus;
 import com.dormitory.entity.Message;
 import com.dormitory.interceptor.WebSocketHandShakeInterceptor;
 import com.dormitory.service.IMessageService;
+import com.dormitory.util.DateUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@Configuration
+
+@Component
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 	
-	@Autowired
+	@Resource(name = "webSocketHandler")
 	private MyWebSocketHandler webSocketHandler;
+	
+	@Autowired
+	private WebSocketHandShakeInterceptor handshakeInterceptor;
 	
 	@Resource(name = "messageService")
 	private IMessageService messageService;
@@ -43,15 +48,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry arg0) {
 		// TODO Auto-generated method stub
-		arg0.addHandler(webSocketHandler, "/ws").addInterceptors(new WebSocketHandShakeInterceptor());
+		System.out.println("add webSocketHandler");
+		arg0.addHandler(webSocketHandler, "/webSocket").addInterceptors(handshakeInterceptor);
+		//arg0.addHandler(webSocketHandler, "/webSocket").addInterceptors(new WebSocketHandShakeInterceptor()).withSockJS();
 	}
 	
 	@Bean(name = "webSocketHandler")
 	public MyWebSocketHandler createWebSockerHandler() {
+		System.out.println("create myWebSocketHandler");
 		return new MyWebSocketHandler();
 	}
 	
-	private class MyWebSocketHandler implements WebSocketHandler {
+	private class MyWebSocketHandler extends TextWebSocketHandler {
 		
 		private final Map<String, WebSocketSession> socketSessionMap = new ConcurrentHashMap<>();
 		private Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-mm-dd HH:mm:ss").create();
@@ -71,9 +79,15 @@ public class WebSocketConfig implements WebSocketConfigurer {
 		@Override
 		public void afterConnectionEstablished(WebSocketSession arg0) throws Exception {
 			// TODO Auto-generated method stub
+			System.out.println("连接成功后");
 			String uid = (String) arg0.getAttributes().get("uid");
 			if (socketSessionMap.get(uid) == null) {
 				socketSessionMap.put(uid, arg0);
+			}
+			for (String userId : socketSessionMap.keySet()) {
+				if (userId != null) {
+					System.out.println(userId);
+				}
 			}
 		}
 
@@ -86,7 +100,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 			// 构建消息对象
 			Message message = gson.fromJson(arg1.getPayload().toString(), Message.class);
 			message.setStatus(MessageStatus.NOT_SEND);
-			message.setSendDate(new Date());
+			message.setSendDate(DateUtil.dateToString(new Date(), "yyyy-MM-dd HH:mm:ss"));
 			//发送消息
 			WebSocketSession session = socketSessionMap.get(message.getReceiverId());
 			if (session != null && session.isOpen()) {

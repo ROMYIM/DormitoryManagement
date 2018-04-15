@@ -4,7 +4,23 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Home</title>
+<script type="text/javascript">
+	function webSocketTest() {
+		var host = window.location.host;
+		var ws = new WebSocket("ws://" + host + "/DormitoryManagement/webSocket?userId=140201021012");
+		ws.onopen = function() {
+			console.log("open");
+			ws.send("send test");
+		}
+		ws.onclose = function() {
+			console.log("close");
+		}
+		ws.onmessage = function(msg) {
+			console.log("get message");
+		}
+	}
+</script>
 </head>
 <body>
 <p>hello world</p>

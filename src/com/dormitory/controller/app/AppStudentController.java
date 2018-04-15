@@ -31,12 +31,14 @@ import com.dormitory.constant.ResultType;
 import com.dormitory.entity.Bill;
 import com.dormitory.entity.Building;
 import com.dormitory.entity.Dormitory;
+import com.dormitory.entity.Message;
 import com.dormitory.entity.Notice;
 import com.dormitory.entity.RepairInformation;
 import com.dormitory.entity.ResponseResult;
 import com.dormitory.entity.Student;
 import com.dormitory.entity.User;
 import com.dormitory.entity.ViolationRecord;
+import com.dormitory.service.IMessageService;
 import com.dormitory.service.IStudentService;
 import com.dormitory.util.CookieUtil;
 
@@ -48,6 +50,9 @@ public class AppStudentController {
 
 	@Resource(name = "studentService")
 	private IStudentService studentService;
+	
+	@Resource(name = "messageService")
+	private IMessageService messageService;
 	
 	public AppStudentController() {
 		// TODO Auto-generated constructor stub
@@ -177,6 +182,9 @@ public class AppStudentController {
 	@RequestMapping(value = "/lookNotices", method = RequestMethod.GET)
 	public ResponseResult lookNotices(@ModelAttribute("result") ResponseResult result,
 			@ModelAttribute("user") Student student, InformationQueryType queryType, Date from, Date to) {
+		if (student.getDormitory() == null) {
+			return result.setResult(ResultType.ERR_DORMITORY);
+		}
 		Integer buildingNum = student.getDormitory().getBuilding().getBuildingNum();
 		List<Notice> notices = studentService.findNoticesBySendDate(buildingNum, from, to);
 		if (notices == null || notices.size() == 0) {
@@ -189,15 +197,25 @@ public class AppStudentController {
 	@RequestMapping(value = "/lookInfo", method = RequestMethod.GET)
 	public ResponseResult lookInfo(@ModelAttribute("user") Student student, @ModelAttribute("result") ResponseResult result) {
 		student.setViolationRecords(studentService.lookViolationes(student.getId(), null, null));
-		Building building = student.getDormitory().getBuilding();
-		building.setDorAdmins(null);
-		building.setDormitories(null);
-		building.setNotices(null);
-		Dormitory dormitory = student.getDormitory();
-		dormitory.setRepairInformations(null);
-		dormitory.setStudents(null);
-		dormitory.setBills(null);
+		if (student.getDormitory() != null) {
+			Building building = student.getDormitory().getBuilding();
+			building.setDorAdmins(null);
+			building.setDormitories(null);
+			building.setNotices(null);
+			Dormitory dormitory = student.getDormitory();
+			dormitory.setRepairInformations(null);
+			dormitory.setStudents(null);
+			dormitory.setBills(null);
+		}
 		result.setResult(ResultType.SUCCESS).setResult(student);
+		return result;
+	}
+	
+	@RequestMapping(value = "/getMessage", method = RequestMethod.GET)
+	public ResponseResult getMessage(@ModelAttribute("user") Student student, @ModelAttribute("result") ResponseResult result, 
+			String receiverId, String sendDate) {
+		List<Message> messages = messageService.findMessagsBySendDate(student.getId(), receiverId, sendDate);
+		result.setResult(ResultType.SUCCESS).setResult(messages);
 		return result;
 	}
 	
